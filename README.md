@@ -3,19 +3,31 @@
 ## **Description**
 
 The **Wine Menu Mobile App** is a simple and elegant tool designed for restaurants to easily display and manage their wine selection. When customers or staff open the app, they can instantly see a list of all available wines with their names and prices. By selecting a wine, they can view all its details — such as where and when it was made, and its alcohol percentage.  
-The app also allows restaurant staff to add, edit, or delete wines. The app remains fully functional even when the internet is unavailable or the external server is unreachable, storing new wines locally until a connection is re-established.
+The app also allows restaurant staff to add, edit, or delete wines. Built with real-time collaboration in mind, any change made by one user is instantly reflected on all other devices currently using the app. The app remains fully functional even when the internet is unavailable or the external server is unreachable, storing new wines locally until a connection is re-established.
+
+## **Technical Architecture**
+
+The system is built using a modern, high-performance stack designed for reliability and real-time synchronization.
+
+
+| Component             | Technology                | Details |
+|------------------:|---------------------|-------------|
+| **Mobile Client** | Kotlin | A robust native application ensuring smooth performance and offline capabilities using local persistence (Room/SQLite). |
+| **Backend Server** | Go | A high-concurrency server handling API requests and managing WebSocket connections for live updates. |
+| **Database** | PostgreSQL / Room | A relational database ensuring ACID compliance and reliable storage for the wine inventory. |
+| **Communication** | REST & WebSockets | REST is used for CRUD actions, while WebSockets push live updates to all connected clients immediately. |
 
 ## **Domain Details**
 
 The app has a single main entity: **Wine**. Each wine represents one product in the restaurant’s wine list and includes the following fields:
 
-| Field             | Type                | Description |
+| Field | Type | Description |
 |------------------:|---------------------|-------------|
-| **Name**          | Text                | The name of the wine as it appears on the restaurant’s menu. |
-| **Price**         | Number (e.g. 24.99) | The selling price of the wine in the restaurant’s currency. |
-| **Production Date** | Date              | The year or exact date the wine was made. Helps identify its age and quality. |
-| **Origin Location** | Text              | The geographical area (e.g. Bordeaux, France) where the wine was produced. |
-| **Alcohol Degree**  | Number (e.g. 13%) | The percentage of alcohol contained in the wine. |
+| **Name** | Text | The name of the wine as it appears on the restaurant’s menu. |
+| **Price** | Number (e.g. 24.99) | The selling price of the wine in the restaurant’s currency. |
+| **Production Date** | Date | The year or exact date the wine was made. Helps identify its age and quality. |
+| **Origin Location** | Text | The geographical area (e.g. Bordeaux, France) where the wine was produced. |
+| **Alcohol Degree** | Number (e.g. 13%) | The percentage of alcohol contained in the wine. |
 
 ## **CRUD Operations**
 
@@ -37,13 +49,17 @@ The app uses two storage layers:
 
 This ensures the app works reliably without an internet connection or during server outages.
 
-### ✅ **Online Mode**
+### ✅ **Online Mode & Real-Time Updates**
 
 When the device has an internet connection and the server is running:
 
-- All CRUD operations (**Create**, **Read**, **Update**, **Delete**) are sent directly to the server.  
-- The local database stores a copy of any wines that the user loads, creates, updates, or deletes.  
-- If a server error occurs, the user is notified with a clear message.
+- **REST API:** All CRUD operations (Create, Read, Update, Delete) are sent to the Go server via HTTP requests.
+
+- **WebSockets:** The app maintains an open WebSocket connection. When any user modifies a wine, the server broadcasts a message to all other connected clients.
+
+- **Live UI:** The app listens for these WebSocket messages and updates the list view instantly without the user needing to refresh.
+
+- **Persistence:** The local database stores a copy of any data received from the server (REST or WebSocket) to ensure the cache is always fresh.
 
 ### ⚙️ **Offline & Server Unavailable Mode**
 
@@ -64,6 +80,7 @@ When the internet connection is restored or the server becomes reachable again:
 2. If all operations complete successfully, local copies are marked as synchronized.  
 3. If some wines conflict with existing server data, the user is notified, and only non-conflicting items are applied.  
 4. The local database is refreshed with the latest server data.
+5. Broadcast: Once the server successfully processes the offline changes, it broadcasts these updates via WebSockets to all other currently connected users, ensuring everyone stays in sync.
 
 This mechanism preserves data integrity while keeping the app usable offline.
 
@@ -94,17 +111,16 @@ After reconnection, the app deletes it on the server as well.
 ## **App mockup**
 
 ![wine-list page](Screenshot_20251016-174154.png)
-![add-edit page](Screenshot_20251016-174202.png)
 
 ## **Summary**
 
-| Feature        | Online | Offline / Server Unreachable |
+| Feature | Online | Offline / Server Unreachable |
 |---------------:|:------:|:----------------|
-| View Wines     | ✅ | ✅ (cached items only) |
-| Add Wine       | ✅ | ✅ (stored locally until sync) |
-| Update Wine    | ✅ | ✅ (stored locally until sync) |
-| Delete Wine    | ✅ | ✅ (stored locally until sync) |
-| Data Sync      | Automatic | Automatic when reconnected |
+| View Wines | ✅ | ✅ (cached items only) |
+| Add Wine | ✅ | ✅ (stored locally until sync) |
+| Update Wine | ✅ | ✅ (stored locally until sync) |
+| Delete Wine | ✅ | ✅ (stored locally until sync) |
+| Data Sync | Automatic | Automatic when reconnected |
 
 ---
 
