@@ -1,4 +1,4 @@
-# 🍷 Wine Menu Mobile App
+# Wine Menu Mobile App
 
 ## **Description**
 
@@ -49,7 +49,7 @@ The app uses two storage layers:
 
 This ensures the app works reliably without an internet connection or during server outages.
 
-### ✅ **Online Mode & Real-Time Updates**
+### **Online Mode & Real-Time Updates**
 
 When the device has an internet connection and the server is running:
 
@@ -61,7 +61,7 @@ When the device has an internet connection and the server is running:
 
 - **Persistence:** The local database stores a copy of any data received from the server (REST or WebSocket) to ensure the cache is always fresh.
 
-### ⚙️ **Offline & Server Unavailable Mode**
+### **Offline & Server Unavailable Mode**
 
 When the device has no internet connection, or when the device is online but the server is returning errors (e.g., 500 Internal Server Error, Timeout), the app automatically switches to local handling:
 
@@ -72,7 +72,7 @@ When the device has no internet connection, or when the device is online but the
 | **Update (Edit)** | Works locally. The user can modify wines stored in the local DB. Changes are marked as “pending updates” and synced when online. |
 | **Delete (Remove)** | Works locally. Wines marked for deletion are hidden from the interface and flagged as “pending deletion” until synced. |
 
-## **🔄 Synchronization on Reconnection**
+## **Synchronization on Reconnection**
 
 When the internet connection is restored or the server becomes reachable again:
 
@@ -88,22 +88,22 @@ This mechanism preserves data integrity while keeping the app usable offline.
 
 Below are example scenarios for each CRUD operation while offline:
 
-### 🆕 **Create Example**
+### **Create Example**
 The user adds a new wine named *“Château Soleil 2020”* while the restaurant Wi-Fi is down.  
 The app stores it locally and displays it in the list with a small “⏳ Pending Sync” label.  
 When internet returns, the wine is automatically uploaded to the server and the label disappears.
 
-### 📖 **Read Example**
+### **Read Example**
 The user opens the app while offline.  
 It can still browse wines they viewed earlier that are cached locally.
 Wines changed after the last connection will appear with a “pending" label until it reconnects.
 
-### ✏️ **Update Example**
+### **Update Example**
 The user edits the price of “Cabernet Noir 2019” while the device has 4G, but the backend server is undergoing maintenance. 
 The app detects the server is unreachable, updates the local record, and marks it as “Pending Update.” 
 Once the server is back online, the change syncs automatically.
 
-### 🗑️ **Delete Example**
+### **Delete Example**
 The user deletes *“Old Barrel 2015”* while offline.  
 The wine disappears from the local list and is flagged as “Pending Deletion.”  
 After reconnection, the app deletes it on the server as well.
@@ -116,10 +116,10 @@ After reconnection, the app deletes it on the server as well.
 
 | Feature | Online | Offline / Server Unreachable |
 |---------------:|:------:|:----------------|
-| View Wines | ✅ | ✅ (cached items only) |
-| Add Wine | ✅ | ✅ (stored locally until sync) |
-| Update Wine | ✅ | ✅ (stored locally until sync) |
-| Delete Wine | ✅ | ✅ (stored locally until sync) |
+| View Wines | yes | yes (cached items only) |
+| Add Wine | yes | yes (stored locally until sync) |
+| Update Wine | yes | yes (stored locally until sync) |
+| Delete Wine | yes | yes (stored locally until sync) |
 | Data Sync | Automatic | Automatic when reconnected |
 
 ---
